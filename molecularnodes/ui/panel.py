@@ -1,3 +1,4 @@
+from typing import TYPE_CHECKING
 import bpy
 from databpy.object import LinkedObjectError
 from ..blender import IS_BLENDER_5
@@ -9,32 +10,35 @@ from ..session import get_session
 from .pref import addon_preferences
 from .utils import check_online_access_for_ui
 
+if TYPE_CHECKING:
+    from .props import MolecularNodesSceneProperties
 
-def panel_wwpdb(layout, scene):
+
+def panel_wwpdb(layout, scene_mn: "MolecularNodesSceneProperties"):
     layout.label(text="Download from PDB", icon="IMPORT")
     layout.separator()
 
     layout = check_online_access_for_ui(layout)
 
     row_import = layout.row().split(factor=0.5)
-    row_import.prop(scene.mn, "import_code_pdb")
+    row_import.prop(scene_mn, "import_code_pdb")
     row = row_import.split(factor=0.3)
-    row.prop(scene.mn, "import_format_fetch", text="")
+    row.prop(scene_mn, "import_format_fetch", text="")
     op = row.operator("mn.import_fetch")
-    op.code = scene.mn.import_code_pdb  # type: ignore
-    op.database = "wwpdb"  # type: ignore
-    op.file_format = scene.mn.import_format_fetch  # type: ignore
-    op.node_setup = scene.mn.import_node_setup  # type: ignore
-    op.remove_solvent = scene.mn.import_remove_solvent  # type: ignore
-    op.assembly = scene.mn.import_build_assembly  # type: ignore
-    op.style = scene.mn.import_style  # type: ignore
-    op.centre = scene.mn.import_centre  # type: ignore
-    op.centre_type = scene.mn.import_centre_type  # type: ignore
+    op.code = scene_mn.import_code_pdb
+    op.database = "wwpdb"
+    op.file_format = scene_mn.import_format_fetch
+    op.node_setup = scene_mn.import_node_setup
+    op.remove_solvent = scene_mn.import_remove_solvent
+    op.assembly = scene_mn.import_build_assembly
+    op.style = scene_mn.import_style
+    op.centre = scene_mn.import_centre
+    op.centre_type = scene_mn.import_centre_type
     prefs = addon_preferences()
     if prefs is not None:
-        op.cache_dir = str(prefs.cache_dir)  # type: ignore
+        op.cache_dir = str(prefs.cache_dir)
     else:
-        op.cache_dir = str(bpy.app.tempdir)  # type: ignore
+        op.cache_dir = str(bpy.app.tempdir)
     layout.separator(factor=0.4)
 
     layout.separator()
@@ -43,43 +47,43 @@ def panel_wwpdb(layout, scene):
     options = layout.column(align=True)
 
     row = options.row()
-    row.prop(scene.mn, "import_node_setup", text="")
+    row.prop(scene_mn, "import_node_setup", text="")
     col = row.column()
-    col.prop(scene.mn, "import_style")
-    col.enabled = scene.mn.import_node_setup
+    col.prop(scene_mn, "import_style")
+    col.enabled = scene_mn.import_node_setup
 
     row_centre = options.row()
-    row_centre.prop(scene.mn, "import_centre", icon_value=0)
+    row_centre.prop(scene_mn, "import_centre", icon_value=0)
     col_centre = row_centre.column()
-    col_centre.prop(scene.mn, "import_centre_type", text="")
-    col_centre.enabled = scene.mn.import_centre
+    col_centre.prop(scene_mn, "import_centre_type", text="")
+    col_centre.enabled = scene_mn.import_centre
     options.separator()
 
     grid = options.grid_flow()
-    grid.prop(scene.mn, "import_build_assembly")
-    grid.prop(scene.mn, "import_remove_solvent")
-    grid.prop(scene.mn, "import_del_hydrogen")
+    grid.prop(scene_mn, "import_build_assembly")
+    grid.prop(scene_mn, "import_remove_solvent")
+    grid.prop(scene_mn, "import_del_hydrogen")
 
 
-def panel_alphafold(layout, scene):
+def panel_alphafold(layout, scene_mn: "MolecularNodesSceneProperties"):
     layout.label(text="Download from the AlphaFold DataBase", icon="IMPORT")
     layout.separator()
 
     layout = check_online_access_for_ui(layout)
 
     row_import = layout.row().split(factor=0.5)
-    row_import.prop(scene.mn, "import_code_alphafold")
+    row_import.prop(scene_mn, "import_code_alphafold")
     download = row_import.split(factor=0.3)
-    download.prop(scene.mn, "import_format_fetch", text="")
+    download.prop(scene_mn, "import_format_fetch", text="")
     op = download.operator("mn.import_fetch")
-    op.code = scene.mn.import_code_alphafold  # type: ignore
+    op.code = scene_mn.import_code_alphafold  # type: ignore
     op.database = "alphafold"  # type: ignore
-    op.file_format = scene.mn.import_format_fetch  # type: ignore
-    op.node_setup = scene.mn.import_node_setup  # type: ignore
-    op.assembly = scene.mn.import_build_assembly  # type: ignore
-    op.style = scene.mn.import_style  # type: ignore
-    op.centre = scene.mn.import_centre  # type: ignore
-    op.centre_type = scene.mn.import_centre_type  # type: ignore
+    op.file_format = scene_mn.import_format_fetch  # type: ignore
+    op.node_setup = scene_mn.import_node_setup  # type: ignore
+    op.assembly = scene_mn.import_build_assembly  # type: ignore
+    op.style = scene_mn.import_style  # type: ignore
+    op.centre = scene_mn.import_centre  # type: ignore
+    op.centre_type = scene_mn.import_centre_type  # type: ignore
     prefs = addon_preferences()
     if prefs is not None:
         op.cache_dir = str(prefs.cache_dir)  # type: ignore
@@ -95,88 +99,88 @@ def panel_alphafold(layout, scene):
     options = layout.column(align=True)
 
     row = options.row()
-    row.prop(scene.mn, "import_node_setup", text="")
+    row.prop(scene_mn, "import_node_setup", text="")
     col = row.column()
-    col.prop(scene.mn, "import_style")
-    col.enabled = scene.mn.import_node_setup
+    col.prop(scene_mn, "import_style")
+    col.enabled = scene_mn.import_node_setup
 
     row_centre = options.row()
-    row_centre.prop(scene.mn, "import_centre", icon_value=0)
+    row_centre.prop(scene_mn, "import_centre", icon_value=0)
     col_centre = row_centre.column()
-    col_centre.prop(scene.mn, "import_centre_type", text="")
-    col_centre.enabled = scene.mn.import_centre
+    col_centre.prop(scene_mn, "import_centre_type", text="")
+    col_centre.enabled = scene_mn.import_centre
     options.separator()
 
 
 # operator that calls the function to import the structure from a local file
 
 
-def panel_local(layout, scene):
+def panel_local(layout, scene_mn: "MolecularNodesSceneProperties"):
     layout.label(text="Load a Local File", icon="FILE_TICK")
     layout.separator()
 
     row = layout.row()
-    row.prop(scene.mn, "import_local_path")
+    row.prop(scene_mn, "import_local_path")
     op = row.operator("mn.import_local")
-    op.filepath = scene.mn.import_local_path
-    op.node_setup = scene.mn.import_node_setup
-    op.assembly = scene.mn.import_build_assembly
-    op.style = scene.mn.import_style
-    op.centre = scene.mn.import_centre
-    op.remove_solvent = scene.mn.import_remove_solvent
-    op.centre_type = scene.mn.import_centre_type
+    op.filepath = scene_mn.import_local_path
+    op.node_setup = scene_mn.import_node_setup
+    op.assembly = scene_mn.import_build_assembly
+    op.style = scene_mn.import_style
+    op.centre = scene_mn.import_centre
+    op.remove_solvent = scene_mn.import_remove_solvent
+    op.centre_type = scene_mn.import_centre_type
     layout.separator()
 
     layout.label(text="Options", icon="MODIFIER")
     options = layout.column(align=True)
 
     row = options.row()
-    row.prop(scene.mn, "import_node_setup", text="")
+    row.prop(scene_mn, "import_node_setup", text="")
     col = row.column()
-    col.prop(scene.mn, "import_style")
-    col.enabled = scene.mn.import_node_setup
+    col.prop(scene_mn, "import_style")
+    col.enabled = scene_mn.import_node_setup
 
     row_centre = options.row()
 
-    row_centre.prop(scene.mn, "import_centre", icon_value=0)
+    row_centre.prop(scene_mn, "import_centre", icon_value=0)
     # row_centre.prop()
     col_centre = row_centre.column()
-    col_centre.prop(scene.mn, "import_centre_type", text="")
-    col_centre.enabled = scene.mn.import_centre
+    col_centre.prop(scene_mn, "import_centre_type", text="")
+    col_centre.enabled = scene_mn.import_centre
     options.separator()
 
     grid = options.grid_flow()
-    grid.prop(scene.mn, "import_build_assembly")
-    grid.prop(scene.mn, "import_remove_solvent", icon_value=0)
-    grid.prop(scene.mn, "import_del_hydrogen", icon_value=0)
+    grid.prop(scene_mn, "import_build_assembly")
+    grid.prop(scene_mn, "import_remove_solvent", icon_value=0)
+    grid.prop(scene_mn, "import_del_hydrogen", icon_value=0)
 
 
-def panel_starfile(layout, scene):
+def panel_starfile(layout, scene_mn: "MolecularNodesSceneProperties"):
     layout.label(text="Load Star File", icon="FILE_TICK")
     layout.separator()
     row_import = layout.row()
-    row_import.prop(scene.mn, "import_star_file_path")
+    row_import.prop(scene_mn, "import_star_file_path")
     op = row_import.operator("mn.import_star_file")
-    op.filepath = scene.mn.import_star_file_path
-    op.node_setup = scene.mn.import_node_setup
+    op.filepath = scene_mn.import_star_file_path
+    op.node_setup = scene_mn.import_node_setup
 
 
-def panel_cellpack(layout, scene):
+def panel_cellpack(layout, scene_mn: "MolecularNodesSceneProperties"):
     layout.label(text="Load CellPack Model", icon="FILE_TICK")
     layout.separator()
     row = layout.row()
-    row.prop(scene.mn, "import_cell_pack_path")
+    row.prop(scene_mn, "import_cell_pack_path")
     op = row.operator("mn.import_cell_pack")
-    op.filepath = scene.mn.import_cell_pack_path
-    op.node_setup = scene.mn.import_node_setup
+    op.filepath = scene_mn.import_cell_pack_path
+    op.node_setup = scene_mn.import_node_setup
 
 
-def panel_density(layout, scene):
+def panel_density(layout, scene_mn: "MolecularNodesSceneProperties"):
     layout.label(text="Load Density Grids", icon="FILE_TICK")
     layout.separator()
 
     row = layout.row()
-    row.prop(scene.mn, "import_density")
+    row.prop(scene_mn, "import_density")
     row.operator("mn.import_density")
 
     layout.separator()
@@ -184,7 +188,7 @@ def panel_density(layout, scene):
     col.alignment = "LEFT"
     col.scale_y = 0.5
     label = f"\
-    An intermediate file will be created: {scene.mn.import_density}.vdb\
+    An intermediate file will be created: {scene_mn.import_density}.vdb\
     Please do not delete this file or the volume will not render.\
     Move the original .map file to change this location.\
     "
@@ -194,42 +198,44 @@ def panel_density(layout, scene):
     layout.separator()
     layout.label(text="Options", icon="MODIFIER")
 
-    layout.prop(scene.mn, "import_density_invert")
-    layout.prop(scene.mn, "import_density_center")
-    layout.prop(scene.mn, "import_density_overwrite")
+    layout.prop(scene_mn, "import_density_invert")
+    layout.prop(scene_mn, "import_density_center")
+    layout.prop(scene_mn, "import_density_overwrite")
     row = layout.row()
-    row.prop(scene.mn, "import_node_setup", text="")
+    row.prop(scene_mn, "import_node_setup", text="")
     col = row.column()
-    col.prop(scene.mn, "import_density_style")
-    col.enabled = scene.mn.import_node_setup
+    col.prop(scene_mn, "import_density_style")
+    col.enabled = scene_mn.import_node_setup
 
 
-def panel_trajectory(layout, scene):
+def panel_trajectory(layout, scene_mn: "MolecularNodesSceneProperties"):
     layout.label(text="Load MD Trajectories", icon="FILE_TICK")
     layout.separator()
     col = layout.column(align=True)
     row_import = col.row()
-    row_import.prop(scene.mn, "import_md_name")
+    row_import.prop(scene_mn, "import_md_name")
     op = row_import.operator("mn.import_trajectory", text="Load")
-    op.topology = scene.mn.import_md_topology
-    op.trajectory = scene.mn.import_md_trajectory
-    op.name = scene.mn.import_md_name
-    op.style = scene.mn.import_style
-    op.setup_nodes = scene.mn.import_node_setup
+    op.topology = scene_mn.import_md_topology
+    op.trajectory = scene_mn.import_md_trajectory
+    op.name = scene_mn.import_md_name
+    op.style = scene_mn.import_style
+    op.setup_nodes = scene_mn.import_node_setup
     col.separator()
-    col.prop(scene.mn, "import_md_topology")
-    col.prop(scene.mn, "import_md_trajectory")
+    col.prop(scene_mn, "import_md_topology")
+    col.prop(scene_mn, "import_md_trajectory")
 
     layout.separator()
     layout.label(text="Options", icon="MODIFIER")
     row = layout.row()
-    row.prop(scene.mn, "import_node_setup", text="")
+    row.prop(scene_mn, "import_node_setup", text="")
     col = row.column()
-    col.prop(scene.mn, "import_style")
-    col.enabled = scene.mn.import_node_setup
+    col.prop(scene_mn, "import_style")
+    col.enabled = scene_mn.import_node_setup
 
 
-def panel_oxdna(layout: bpy.types.UILayout, scene: bpy.types.Scene) -> None:
+def panel_oxdna(
+    layout: bpy.types.UILayout, scene_mn: "MolecularNodesSceneProperties"
+) -> None:
     """
     Create the panel layout for oxDNA import.
 
@@ -243,14 +249,14 @@ def panel_oxdna(layout: bpy.types.UILayout, scene: bpy.types.Scene) -> None:
     layout.label(text="Load oxDNA File", icon="FILE_TICK")
     layout.separator()
     row = layout.row()
-    row.prop(scene.mn, "import_oxdna_name")
+    row.prop(scene_mn, "import_oxdna_name")
     op = row.operator("mn.import_oxdna")
-    op.name = scene.mn.import_oxdna_name
-    op.topology = scene.mn.import_oxdna_topology
-    op.trajectory = scene.mn.import_oxdna_trajectory
+    op.name = scene_mn.import_oxdna_name
+    op.topology = scene_mn.import_oxdna_topology
+    op.trajectory = scene_mn.import_oxdna_trajectory
     col = layout.column(align=True)
-    col.prop(scene.mn, "import_oxdna_topology")
-    col.prop(scene.mn, "import_oxdna_trajectory")
+    col.prop(scene_mn, "import_oxdna_topology")
+    col.prop(scene_mn, "import_oxdna_trajectory")
 
 
 chosen_panel = {
@@ -296,13 +302,13 @@ def change_style_node_menu(self, context):
     layout.separator()
 
 
-def panel_import(layout, context):
+def panel_import(layout, context: bpy.types.Context):
     scene = context.scene
     selection = scene.mn.panel_import_type
     layout.prop(scene.mn, "panel_import_type")
 
     col = layout.column()
-    chosen_panel[selection](col, scene)
+    chosen_panel[selection](col, scene.mn)
 
 
 def ui_from_node(
