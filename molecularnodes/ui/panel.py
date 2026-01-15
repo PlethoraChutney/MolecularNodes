@@ -286,7 +286,7 @@ chosen_panel = {
     "pdb": panel_wwpdb,
     "local": panel_local,
     "alphafold": panel_alphafold,
-    "star": panel_metadata,
+    "metadata": panel_metadata,
     "md": panel_trajectory,
     "density": panel_density,
     "cellpack": panel_cellpack,

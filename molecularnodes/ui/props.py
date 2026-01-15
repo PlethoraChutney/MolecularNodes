@@ -384,7 +384,7 @@ class MolecularNodesSceneProperties(bpy.types.PropertyGroup):
             ("local", "Local", "Open a local file"),
             ("md", "MD", "Import a molecular dynamics trajectory"),
             ("density", "Density", "Import an EM Density Map"),
-            ("star", "Starfile", "Import a .starfile mapback file"),
+            ("metadata", "Metadata", "Import particle metadata"),
             ("cellpack", "CellPack", "Import a CellPack .cif/.bcif file"),
             ("dna", "oxDNA", "Import an oxDNA file"),
         ),
