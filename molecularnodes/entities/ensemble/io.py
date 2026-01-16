@@ -3,7 +3,7 @@ from .cellpack import CellPack
 from .star import StarFile
 
 
-def load_starfile(file_path, node_setup=True, world_scale=0.01):
+def load_starfile(file_path, node_setup=True, world_scale=0.01) -> StarFile:
     ensemble = StarFile.from_starfile(file_path)
     ensemble.create_object(
         name=Path(file_path).name, node_setup=node_setup, world_scale=world_scale
@@ -11,6 +11,22 @@ def load_starfile(file_path, node_setup=True, world_scale=0.01):
 
     return ensemble
 
+_metadata_load_functions = {
+    "star": load_starfile,
+}
+
+def load_metadata(file_path: Path | str, node_setup: bool = True, world_scale: float = 0.01, file_type: str | None = None):
+    file_path = Path(file_path)
+    if file_type is None:
+        file_type = file_path.suffix
+    load_fn = _metadata_load_functions.get(file_type.lower())
+    if load_fn is None:
+        raise ValueError(f"Unsupported metadata file type: {file_type.lower()}")
+    return load_fn(
+        file_path=file_path,
+        node_setup=node_setup,
+        world_scale=world_scale,
+    )
 
 def load_cellpack(
     file_path,

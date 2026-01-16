@@ -176,9 +176,9 @@ def panel_metadata(
     layout.label(text="Load metadata from STAR or .cs files", icon="FILE_TICK")
     layout.separator()
     row_import = layout.row()
-    row_import.prop(scene_mn, "import_star_file_path")
-    op = row_import.operator("mn.import_star_file")
-    op.filepath = scene_mn.import_star_file_path
+    row_import.prop(scene_mn, "import_metadata_file_path")
+    op = row_import.operator("mn.import_metadata_file")
+    op.filepath = scene_mn.import_metadata_file_path
     op.node_setup = scene_mn.import_node_setup
 
 

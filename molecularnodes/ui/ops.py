@@ -578,11 +578,11 @@ class ImportEnsemble(bpy.types.Operator):
     )
 
 
-class MN_OT_Import_Star_File(ImportEnsemble):
-    bl_idname = "mn.import_star_file"
+class MN_OT_Import_Metadata_File(ImportEnsemble):
+    bl_idname = "mn.import_metadata_file"
     bl_label = "Load"
     bl_description = (
-        "Will import the given file, setting up the points to instance an object."
+        "Will import the given cryoEM metadata file, setting up the points to instance an object."
     )
     bl_options = {"REGISTER"}
 
@@ -1144,7 +1144,7 @@ CLASSES = [
     MN_OT_Import_Trajectory,
     MN_OT_Reload_Trajectory,
     MN_OT_Import_Map,
-    MN_OT_Import_Star_File,
+    MN_OT_Import_Metadata_File,
     MN_OT_Import_Cell_Pack,
     MN_OT_Import_Protein_Local,
     MN_OT_Import_Molecule,

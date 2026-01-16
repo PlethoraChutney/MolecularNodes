@@ -389,9 +389,9 @@ class MolecularNodesSceneProperties(bpy.types.PropertyGroup):
             ("dna", "oxDNA", "Import an oxDNA file"),
         ),
     )
-    import_star_file_path: StringProperty(  # type: ignore
+    import_metadata_file_path: StringProperty(  # type: ignore
         name="File",
-        description="File path for the `.star` file to import.",
+        description="File path for the metadata file to import.",
         subtype="FILE_PATH",
         maxlen=0,
     )
