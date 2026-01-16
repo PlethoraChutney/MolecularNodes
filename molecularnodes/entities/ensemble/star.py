@@ -1,113 +1,28 @@
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import Optional, Union
 import bpy
 import databpy
 import mrcfile
 import numpy as np
 import starfile
-from databpy import AttributeTypes, BlenderObject
-from pandas import CategoricalDtype, DataFrame
+from pandas import DataFrame
 from PIL import Image
-from scipy.spatial.transform import Rotation
 from ... import blender as bl
 from ...nodes import nodes
-from .base import Ensemble, EntityType
-
-
-class EnsembleDataFrame:
-    def __init__(self, data: DataFrame) -> None:
-        self.data = data
-        self._coord_columns: List[str] = ["x", "y", "z"]
-        self._rot_columns: List[str] = ["Rot", "Tilt", "Psi"]
-        self._shift_column_names: List[str] = [
-            "OriginXAngst",
-            "OriginYAngst",
-            "OriginZAngst",
-        ]
-
-    @property
-    def coordinates(self) -> np.ndarray:
-        coord = self.data[self._coord_columns].to_numpy()
-
-        try:
-            shift = self.data[self._shift_column_names].to_numpy()
-            coord -= shift
-        except KeyError:
-            pass
-
-        return coord
-
-    @property
-    def scale(self) -> np.ndarray:
-        arr = np.zeros((len(self.data), 1), dtype=np.float32)
-        arr[:] = 1.0
-        return arr
-
-    @property
-    def coordinates_scaled(self) -> np.ndarray:
-        return self.coordinates * self.scale
-
-    def rotation_as_quaternion(self) -> np.ndarray:
-        rot_tilt_psi_cols = self.data[self._rot_columns].to_numpy()
-
-        quaternions = np.array(
-            [
-                Rotation.from_euler("ZYZ", row, degrees=True)
-                .inv()
-                .as_quat(scalar_first=True)
-                for row in rot_tilt_psi_cols
-            ]
-        )
-        return quaternions
-
-    def image_id_values(self) -> np.ndarray:
-        for name in [
-            "rlnImageName",
-            "rlnMicrographName",
-            "rlnTomoName",
-            "cisTEMOriginalImageFilename",
-        ]:
-            try:
-                return self.data[name].cat.codes.to_numpy()
-            except KeyError:
-                pass
-
-        return np.zeros(len(self.data), dtype=int)
-
-    def store_data_on_object(self, obj: bpy.types.Object) -> None:
-        bob = BlenderObject(obj)
-        bob.store_named_attribute(
-            self.rotation_as_quaternion(),
-            name="rotation",
-            atype=AttributeTypes.QUATERNION,
-        )
-
-        bob.store_named_attribute(
-            self.image_id_values(),
-            name="image_id",
-            atype=AttributeTypes.INT,
-        )
-
-        for col in self.data.columns:
-            if isinstance(self.data[col].dtype, CategoricalDtype):
-                bob.object[f"{col}_categories"] = list(self.data[col].cat.categories)
-                data = self.data[col].cat.codes.to_numpy()
-                bob.store_named_attribute(data, name=col, atype=AttributeTypes.INT)
-            else:
-                bob.store_named_attribute(self.data[col].to_numpy(), name=col)
+from .base import Ensemble, EnsembleDataFrame, EntityType
 
 
 class RelionDataFrame(EnsembleDataFrame):
     def __init__(self, data: DataFrame) -> None:
-        super().__init__(data)
+        super().__init__(
+            data,
+            coord_columns=["rlnCoordinateX", "rlnCoordinateY", "rlnCoordinateZ"],
+            rot_columns=["rlnAngleRot", "rlnAngleTilt", "rlnAnglePsi"],
+            shift_columns=["rlnOriginXAngst", "rlnOriginYAngst", "rlnOriginZAngst"],
+            rotation_convention="ZYZ",
+            image_id_columns=["rlnImageName", "rlnMicrographName", "rlnTomoName"],
+        )
         self.type: str = "relion"
-        self._coord_columns = ["rlnCoordinateX", "rlnCoordinateY", "rlnCoordinateZ"]
-        self._rot_columns = ["rlnAngleRot", "rlnAngleTilt", "rlnAnglePsi"]
-        self._shift_column_names = [
-            "rlnOriginXAngst",
-            "rlnOriginYAngst",
-            "rlnOriginZAngst",
-        ]
 
     @property
     def scale(self) -> np.ndarray:
@@ -119,20 +34,20 @@ class RelionDataFrame(EnsembleDataFrame):
 
 class CistemDataFrame(EnsembleDataFrame):
     def __init__(self, data: DataFrame) -> None:
-        super().__init__(data)
+        super().__init__(
+            data,
+            coord_columns=[
+                "cisTEMOriginalXPosition",
+                "cisTEMOriginalYPosition",
+                "cisTEMZFromDefocus",
+            ],
+            rot_columns=["cisTEMAnglePhi", "cisTEMAngleTheta", "cisTEMAnglePsi"],
+            shift_columns=["origin_x", "origin_y", "origin_z"],
+            rotation_convention="ZYZ",
+            image_id_columns="cisTEMOriginalImageFilename",
+        )
         self._adjust_defocus()
         self.type: str = "cistem"
-        self._coord_columns = [
-            "cisTEMOriginalXPosition",
-            "cisTEMOriginalYPosition",
-            "cisTEMZFromDefocus",
-        ]
-        self._rot_columns = ["cisTEMAnglePhi", "cisTEMAngleTheta", "cisTEMAnglePsi"]
-        self._shift_column_names = [
-            "origin_x",
-            "origin_y",
-            "origin_z",
-        ]
 
     def _adjust_defocus(self) -> None:
         self.data["cisTEMZFromDefocus"] = (
