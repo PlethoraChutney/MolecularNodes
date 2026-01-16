@@ -581,9 +581,7 @@ class ImportEnsemble(bpy.types.Operator):
 class MN_OT_Import_Metadata_File(ImportEnsemble):
     bl_idname = "mn.import_metadata_file"
     bl_label = "Load"
-    bl_description = (
-        "Will import the given cryoEM metadata file, setting up the points to instance an object."
-    )
+    bl_description = "Will import the given cryoEM metadata file, setting up the points to instance an object."
     bl_options = {"REGISTER"}
 
     @classmethod
@@ -591,7 +589,7 @@ class MN_OT_Import_Metadata_File(ImportEnsemble):
         return True
 
     def execute(self, context):
-        ensemble.load_starfile(
+        ensemble.load_metadata(
             file_path=path_resolve(self.filepath),
             node_setup=self.node_setup,
         )

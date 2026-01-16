@@ -323,6 +323,27 @@ def create_starting_nodes_starfile(object):
     link(node_input.outputs[0], node_star_instances.inputs[0])
 
 
+def create_starting_nodes_cryosparc(object):
+    # ensure there is a geometry nodes modifier called 'MolecularNodes' that is created and applied to the object
+    node_mod = get_mod(object)
+
+    node_name = f"MN_cryosparc_{object.name}"
+
+    # create a new GN node group, specific to this particular molecule
+    group = new_tree(node_name)
+    node_mod.node_group = group
+    link = group.links.new
+
+    # move the input and output nodes for the group
+    node_input = get_input(group)
+    node_output = get_output(group)
+    node_input.location = [0, 0]
+    node_output.location = [700, 0]
+    node_cs_instances = add_custom(group, "CryoSPARC Instances", [450, 0])
+    link(node_cs_instances.outputs[0], node_output.inputs[0])
+    link(node_input.outputs[0], node_cs_instances.inputs[0])
+
+
 def create_starting_nodes_density(
     object: bpy.types.Object,
     threshold: float = 0.8,

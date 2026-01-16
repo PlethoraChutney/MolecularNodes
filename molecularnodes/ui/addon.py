@@ -101,7 +101,10 @@ def unregister():
     del bpy.types.Scene.mn  # type: ignore
     del bpy.types.Object.mn  # type: ignore
     del bpy.types.Object.mn_trajectory_selections  # type: ignore
-    del bpy.types.Object.mn_annotations  # type: ignore
+    try:
+        del bpy.types.Object.mn_annotations  # type: ignore
+    except AttributeError:
+        pass
     unregister_templates_menu()
 
     _is_registered = False

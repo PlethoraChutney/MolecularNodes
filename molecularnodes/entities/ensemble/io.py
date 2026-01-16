@@ -1,6 +1,11 @@
 from pathlib import Path
+from typing import TYPE_CHECKING
 from .cellpack import CellPack
+from .cryosparc import CsMeta
 from .star import StarFile
+
+if TYPE_CHECKING:
+    from .base import Ensemble
 
 
 def load_starfile(file_path, node_setup=True, world_scale=0.01) -> StarFile:
@@ -11,11 +16,28 @@ def load_starfile(file_path, node_setup=True, world_scale=0.01) -> StarFile:
 
     return ensemble
 
+
+def load_cryosparc_metadata(file_path, node_setup=True, world_scale=0.01) -> CsMeta:
+    ensemble = CsMeta.from_csfile(file_path)
+    ensemble.create_object(
+        name=Path(file_path).name, node_setup=node_setup, world_scale=world_scale
+    )
+
+    return ensemble
+
+
 _metadata_load_functions = {
-    "star": load_starfile,
+    ".star": load_starfile,
+    ".cs": load_cryosparc_metadata,
 }
 
-def load_metadata(file_path: Path | str, node_setup: bool = True, world_scale: float = 0.01, file_type: str | None = None):
+
+def load_metadata(
+    file_path: Path | str,
+    node_setup: bool = True,
+    world_scale: float = 0.01,
+    file_type: str | None = None,
+) -> "Ensemble":
     file_path = Path(file_path)
     if file_type is None:
         file_type = file_path.suffix
@@ -27,6 +49,7 @@ def load_metadata(file_path: Path | str, node_setup: bool = True, world_scale: f
         node_setup=node_setup,
         world_scale=world_scale,
     )
+
 
 def load_cellpack(
     file_path,

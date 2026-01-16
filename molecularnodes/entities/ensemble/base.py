@@ -120,13 +120,17 @@ class EnsembleDataFrame:
 
     @property
     def coordinates(self) -> np.ndarray:
+        if self._coord_columns is None:
+            return np.zeros((len(self.data), 3))
+
         coord = self.data[self._coord_columns].to_numpy()
 
-        try:
-            shift = self.data[self._shift_columns].to_numpy()
-            coord -= shift
-        except KeyError:
-            pass
+        if self._shift_columns is not None:
+            try:
+                shift = self.data[self._shift_columns].to_numpy()
+                coord -= shift
+            except KeyError:
+                pass
 
         return coord
 
@@ -141,6 +145,8 @@ class EnsembleDataFrame:
         return self.coordinates * self.scale
 
     def rotation_as_quaternion(self) -> np.ndarray:
+        if self._rot_columns is None:
+            return np.zeros((len(self.data), 4))
         rot_columns = self.data[self._rot_columns].to_numpy()
         if self._rotation_convention == "ZYZ":
             quaternions = (
@@ -164,6 +170,8 @@ class EnsembleDataFrame:
                 return self.data[col_name].cat.codes.to_numpy()
             except KeyError:
                 continue
+            except AttributeError:
+                return self.data[col_name].to_numpy()
 
         return np.zeros(len(self.data), dtype=int)
 
